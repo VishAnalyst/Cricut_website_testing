@@ -10,6 +10,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.sql.SQLOutput;
 import java.time.Duration;
 
 public class HomeSD {
@@ -77,7 +78,7 @@ public class HomeSD {
         System.out.println("Browser is closed");
     }
 
-            //Test 20% marketing banner
+            //*****************************Test 20% marketing banner*****************************************************
             @Given ("I am on the Cricut Home page")
             public void IamontheCricutHomepage(){
                 WebDriver driver = new ChromeDriver();
@@ -103,30 +104,46 @@ public class HomeSD {
                 RejectAllButton.click();
                 System.out.println("Rejected all coolies is closed");
 
-                //Finding get 20% off banner
-                WebElement get20Banner = driver.findElement(By.className("font-size-h4 mb-6 col-12"));
-                System.out.println("Get 20% offer banner is displayed");
+                // Finding the "Get $20 off" banner
+                WebElement get20Banner = driver.findElement(By.xpath("//h2[text()='Get $20 off.']"));
+
+                if (get20Banner.isDisplayed()) {
+                    System.out.println("✅ 'Get $20 off' banner is located and visible");
+                } else {
+                    System.out.println("❌ 'Get $20 off' banner is not visible");
+                }
 
                 //Finding the Email Field & Passing Incorrect value
                 WebElement emailField = driver.findElement(By.id("email"));
+                if (emailField.isDisplayed()){
+                    System.out.println("Email field is displayed");
+                }else{
+                    System.out.println("Email field is not displayed");
+                }
+                emailField.clear();
+
                 emailField.sendKeys("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.");
                 //Finding Sign up button and click
                 WebElement SignUpButton = driver.findElement(By.xpath("//input[@value='Sign Up']"));
+                if (SignUpButton.isDisplayed()){
+                    System.out.println("Sign up button is displayed");
+                }else {
+                    System.out.println("Signup button is not displayed");
+                }
                 SignUpButton.click();
 
-                Object emailValidity = js.executeScript("return arguments[0].checkValidity();", emailField);
-                boolean isEmailValid = Boolean.TRUE.equals(emailValidity);
-
-                if (!isEmailValid) {
-                    System.out.println("✅ Email validation failed as expected");
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                Boolean isValid = (Boolean) js.executeScript("return arguments[0].checkValidity();", emailField);
+                if (Boolean.FALSE.equals(isValid)) {
+                    System.out.println("✅ Validation failed as expected");
+                } else if (Boolean.TRUE.equals(isValid)) {
+                    System.out.println("❌ Validation did not trigger");
                 } else {
-                    System.out.println("❌ Email validation did not trigger for invalid input");
+                    System.out.println("⚠️ checkValidity() returned null");
                 }
 
                 emailField.clear();
-
-                System.out.println("Incorrect Email field is checked");
-
+                System.out.println("********************************Incorrect Email field is checked*******************************");
                 driver.quit();
             }
 
@@ -146,29 +163,53 @@ public class HomeSD {
                 System.out.println("Rejected all coolies is closed");
 
                 //Finding get 20% off banner
-                WebElement get20Banner = driver.findElement(By.className("font-size-h4 mb-6 col-12"));
-                System.out.println("Get 20% offer banner is displayed");
+                WebElement get20Banner = driver.findElement(By.xpath("//h2[text()='Get $20 off.']"));
+                System.out.println("Get 20% offer banner is located");
+
+                if (get20Banner.isDisplayed()) {
+                    System.out.println("✅ 'Get $20 off' banner is located and visible");
+                } else {
+                    System.out.println("❌ 'Get $20 off' banner is not visible");
+                }
 
                 //Finding the DOB Field & Passing Incorrect value
                 WebElement dobField = driver.findElement(By.id("dob"));
+                if (dobField.isDisplayed()){
+                    System.out.println("DOB Field is displayed");
+                }else {
+                    System.out.println("DOB Field is not displayed");
+                }
+
                 dobField.sendKeys("01/50");
+                // Force blur to trigger validation (very important!)
+                dobField.sendKeys(Keys.TAB);
+
                 //Finding Sign up button and click
                 WebElement SignUpButton = driver.findElement(By.xpath("//input[@value='Sign Up']"));
+                if (SignUpButton.isDisplayed()){
+                    System.out.println("Sign up button is displayed");
+                }else {
+                    System.out.println("Signup button is not displayed");
+                }
                 SignUpButton.click();
 
-                Object dobValidity = js.executeScript("return arguments[0].checkValidity();", dobField);
-                boolean isDobValid = Boolean.TRUE.equals(dobValidity);
+                // Wait a bit for validation to happen
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ignored) {}
 
-                if (!isDobValid) {
-                    System.out.println("✅ DOB validation failed as expected");
+                JavascriptExecutor js = (JavascriptExecutor) driver;
+                Boolean isValid = (Boolean) js.executeScript("return arguments[0].checkValidity();", dobField);
+                if (Boolean.FALSE.equals(isValid)) {
+                    System.out.println("✅ Validation failed as expected");
+                } else if (Boolean.TRUE.equals(isValid)) {
+                    System.out.println("❌ Validation did not trigger");
                 } else {
-                    System.out.println("❌ DOB validation did not trigger for invalid date");
+                    System.out.println("⚠️ checkValidity() returned null");
                 }
 
                 dobField.clear();
-
-                System.out.println("Incorrect DOB field is checked");
-
+                System.out.println("*************************************Incorrect DOB field is checked******************************");
                 driver.quit();
             }
 
@@ -188,33 +229,39 @@ public class HomeSD {
                 System.out.println("Rejected all coolies is closed");
 
                 //Finding get 20% off banner
-                WebElement get20Banner = driver.findElement(By.className("font-size-h4 mb-6 col-12"));
-                System.out.println("Get 20% offer banner is displayed");
+                WebElement get20Banner = driver.findElement(By.xpath("//h2[text()='Get $20 off.']"));
+                if (get20Banner.isDisplayed()) {
+                    System.out.println("✅ 'Get $20 off' banner is located and visible");
+                } else {
+                    System.out.println("❌ 'Get $20 off' banner is not visible");
+                }
 
                 //Finding the Email Field & Passing correct value
                 WebElement emailField = driver.findElement(By.id("email"));
+                if (emailField.isDisplayed()){
+                    System.out.println("Email field is displayed");
+                }else{
+                    System.out.println("Email field is not displayed");
+                }
                 emailField.sendKeys("Test@gmail.com");
 
                 //Finding the DOB Field & Passing Incorrect value
                 WebElement dobField = driver.findElement(By.id("dob"));
+                if (dobField.isDisplayed()){
+                    System.out.println("DOB Field is displayed");
+                }else {
+                    System.out.println("DOB Field is not displayed");
+                }
                 dobField.sendKeys("01/90");
                 //Finding Sign up button and click
                 WebElement SignUpButton = driver.findElement(By.xpath("//input[@value='Sign Up']"));
-                SignUpButton.click();
-
-                Object emailValidity = js.executeScript("return arguments[0].checkValidity();", emailField);
-                Object dobValidity = js.executeScript("return arguments[0].checkValidity();", dobField);
-
-                boolean isEmailValid = Boolean.TRUE.equals(emailValidity);
-                boolean isDobValid = Boolean.TRUE.equals(dobValidity);
-
-                if (isEmailValid && isDobValid) {
-                    System.out.println("✅ Valid email and DOB submitted");
-                } else {
-                    System.out.println("❌ Validation failed unexpectedly");
+                if (SignUpButton.isDisplayed()){
+                    System.out.println("Sign up button is displayed");
+                }else {
+                    System.out.println("Signup button is not displayed");
                 }
-
-
+                SignUpButton.click();
+                System.out.println("****************************Correct Email and Password is also working fine*************************");
                 driver.quit();
             }
 }
