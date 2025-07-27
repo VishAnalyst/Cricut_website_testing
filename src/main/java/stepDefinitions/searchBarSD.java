@@ -17,8 +17,10 @@ import java.time.Duration;
 public class searchBarSD {
     WebDriver driver = new ChromeDriver();
 
+
     @Given("User is on Cricut homepage")
     public void userIsOnCricutHomepage() {
+
         driver.get("https://cricut.com/en-us/");
         driver.manage().window().maximize();
 
