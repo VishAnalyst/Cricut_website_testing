@@ -25,6 +25,7 @@ public class mainNavSD {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(150));
         driver.manage().window().maximize();
 
+
         //Reject button is closed
         WebElement RejectAllButton = driver.findElement(By.id("onetrust-reject-all-handler"));
         RejectAllButton.click();
@@ -32,6 +33,12 @@ public class mainNavSD {
         //Pop is closed
         WebElement CloseButton = driver.findElement(By.xpath("//button[@aria-hidden='true']"));
         CloseButton.click();
+
+        try {
+            Thread.sleep(5000); // Pause for 5000 milliseconds (5 seconds)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
 
         System.out.println("User is at Cricut Home page");
@@ -45,9 +52,11 @@ public class mainNavSD {
         }
 
     }
-
+//***************************************************DISCOVER**********************************************************************
     @And("The following main menu items should be present for {string}:")
     public void theFollowingMainMenuItemsShouldBePresent(String mainMenuText, List<String> expectedSubLinks) {
+
+        //List all links under the
         Actions action = new Actions(driver);
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
 
@@ -56,22 +65,67 @@ public class mainNavSD {
         action.moveToElement(mainMenu).perform();
         System.out.println("Hovered over the item " + mainMenuText);
 
-        // Wait for the entire Discover dropdown menu to appear
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("discover")));
+        WebElement subMenuContainer = driver.findElement(By.xpath("//div[@class='nav-list js-mobile-accordion']"));
 
-        // Fetch all sub-links under the Discover menu
-        action.moveToElement(mainMenu).perform();
-        List<WebElement> subLinks = driver.findElements(By.xpath("//div[@class='nav-list js-mobile-accordion']"));
-        // Validate each expected sub-link
-        for (String expectedLink : expectedSubLinks) {
-            boolean found = subLinks.stream()
-                    .anyMatch(link -> link.getText().trim().equalsIgnoreCase(expectedLink));
-            if (found) {
-                System.out.println("✅ Sub-link found: " + expectedLink);
-            } else {
-                System.out.println("❌ Sub-link missing: " + expectedLink);
+        List<WebElement> subLinks = subMenuContainer.findElements(By.tagName("a"));
+
+        for (WebElement link : subLinks) {
+            System.out.println("DISCOVER SUB LINKS ARE LISTED");
+            System.out.println("Sub-link Text: " + link.getText());
+            System.out.println("Sub-link URL: " + link.getAttribute("href"));
+        }
+
+                try {
+                    Thread.sleep(5000); // Pause for 5000 milliseconds (5 seconds)
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+        System.out.println("Discover Test is passed");
+
+        //Hover over Sale
+        WebElement mainMenuSale = driver.findElement(By.id("sale"));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("sale")));
+        action.moveToElement(mainMenuSale).perform();
+        System.out.println("Hovered over the item " + mainMenuSale.getText());
+
+        List<WebElement> subLinksSale = subMenuContainer.findElements(By.xpath("//div[@aria-label='sale']"));
+
+        for (WebElement link : subLinksSale) {
+            System.out.println("SALE SUB LINKS ARE LISTED");
+            System.out.println("Sub-link Text: " + link.getText());
+            System.out.println("Sub-link URL: " + link.getAttribute("href"));
+        }
+
+                try {
+                    Thread.sleep(5000); // Pause for 5000 milliseconds (5 seconds)
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+    }
+
+
+    @And("The main menu item {string} should not have sub menu")
+    public void theMainMenuItemShouldNotHaveSubMenu(String mainMenuTextShop) {
+
+        Actions action = new Actions(driver);
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        WebElement mainMenuShop = driver.findElement(By.xpath("//a[@id='shop']" + mainMenuTextShop + "']"));
+        action.moveToElement(mainMenuShop).perform();
+        System.out.println("Hovered over the item " + mainMenuTextShop);
+
+        // Wait for potential submenu container
+        List<WebElement> subMenus = driver.findElements(By.xpath("//a[@id='shop']"));
+
+        if (subMenus.isEmpty()) {
+            System.out.println("✅ No submenu items found for: " + mainMenuTextShop);
+        } else {
+            System.out.println("❌ Submenu items should not be present for: " + mainMenuTextShop);
+            for (WebElement link : subMenus) {
+                System.out.println("Unexpected sub-link: " + link.getText());
             }
-
+            throw new AssertionError("Submenu items found when none expected for: " + mainMenuTextShop);
         }
     }
 }

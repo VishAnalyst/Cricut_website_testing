@@ -5,7 +5,6 @@ Feature: Main Navigation Menu
   So that I can access all the major sections of the website
 
   Given User is on Cricut homepage
-
   Scenario: Verify main navigation links are displayed
     Then The main navigation bar should be visible
     And The following main menu items should be present for "Discover":
@@ -21,3 +20,13 @@ Feature: Main Navigation Menu
       | Blog                  |
       | Community             |
       | Projects              |
+
+    And The main menu item "Shop" should not have sub menu
+
+    And The following main menu items should be present for "Sale":
+      | Clearance                       |
+      | Cricut Access™ Exclusives       |
+      | Bundles                         |
+      | Refurbished & Open Box Machines |
+      | Bulk                            |
+      | Mystery Box                     |
