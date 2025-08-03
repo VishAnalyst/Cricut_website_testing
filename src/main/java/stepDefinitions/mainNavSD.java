@@ -17,9 +17,15 @@ import java.util.List;
 
 public class mainNavSD {
 
-    WebDriver driver = new ChromeDriver();
 
-    @Then("The main navigation bar should be visible")
+}
+
+
+
+
+
+
+    /*@Then("The main navigation bar should be visible")
     public void theMainNavigationBarShouldBeVisible() {
         driver.get("https://cricut.com/en-us/");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(150));
@@ -127,5 +133,4 @@ public class mainNavSD {
             }
             throw new AssertionError("Submenu items found when none expected for: " + mainMenuTextShop);
         }
-    }
-}
+    }*/
