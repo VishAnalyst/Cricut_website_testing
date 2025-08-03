@@ -27,4 +27,16 @@ Feature: Main Navigation Menu
       | Inspiration        | Teachers              |
       | Inspiration        | Blog                  |
 
+  Scenario: Verify 'Shop' nav item is present and has no sub-links
+    Then The main navigation item "Shop" should be visible
+    And The "Shop" navigation item should not have any sub-links
+
+  Scenario: Verify 'Sale' nav item and its sub-links
+    And The "Sale" navigation item should have the following sub-links:
+      | Clearance                       |
+      | Cricut Access™ Exclusives       |
+      | Bundles                         |
+      | Refurbished & Open Box Machines |
+      | Bulk                            |
+      | Mystery Box                     |
 
