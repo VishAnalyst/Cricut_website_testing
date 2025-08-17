@@ -220,6 +220,7 @@ public class HowItWorksSD {
         String actualDescription = descriptionElement.getText().trim();
 
         Assert.assertEquals("Description does not match!", expectedDescription, actualDescription);
+        driver.quit();
     }
 
 }
