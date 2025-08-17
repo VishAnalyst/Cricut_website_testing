@@ -1,8 +1,10 @@
 package stepDefinitions;
 
+import io.cucumber.datatable.DataTable;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -12,6 +14,8 @@ import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
 public class seeWhatsPossibleSD {
     WebDriver driver = new ChromeDriver();
@@ -86,6 +90,68 @@ public class seeWhatsPossibleSD {
         String actualText = description.getText();
         if (!actualText.equals(expectedText)) {
             throw new AssertionError("Expected: " + expectedText + " but got: " + actualText);
+        }
+    }
+
+
+    @Then("I should see exactly {int} items in the {string} carousel")
+    public void iShouldSeeExactlyItemsInTheCarousel(int expectedCount,String carouselName) {
+        // locate based on carousel name (for flexibility)
+        By locator = null;
+
+        if (carouselName.equals("See what's possible with Cricut")) {
+            locator = By.cssSelector("div[role='list'] div[role='listitem']");
+        }
+        // you can add more carousels here if needed
+
+        List<WebElement> items = driver.findElements(locator);
+        int actualCount = items.size();
+
+        Assert.assertEquals(
+                "Number of items in " + carouselName + " carousel mismatch",
+                expectedCount,
+                actualCount
+        );
+        System.out.println("CONATINER LOCATED");
+        System.out.println("Expected: "+ expectedCount);
+        System.out.println("Actual: "+ actualCount);
+
+
+    }
+
+
+    @And("the items should have the following content for whats possible:")
+    public void theItemsShouldHaveTheFollowingContentForWhatsPossible(io.cucumber.datatable.DataTable dataTable) {
+        // Convert DataTable to List<Map>
+        List<Map<String, String>> expectedItems = dataTable.asMaps(String.class, String.class);
+
+        // Locate all carousel items (title = alt text, description = text)
+        List<WebElement> carouselItems = driver.findElements(
+                By.cssSelector("div[role='list'] div[role='listitem']")
+        );
+
+        // Assert count matches
+        Assert.assertEquals("Number of carousel items mismatch",
+                expectedItems.size(), carouselItems.size());
+
+        for (int i = 0; i < expectedItems.size(); i++) {
+            Map<String, String> expected = expectedItems.get(i);
+            WebElement item = carouselItems.get(i);
+
+            // Title (alt text of image)
+            WebElement img = item.findElement(By.tagName("img"));
+            String actualTitle = img.getAttribute("alt").trim();
+            Assert.assertEquals("Title mismatch at item " + (i+1),
+                    expected.get("Title (Alt text)"), actualTitle);
+
+            // Description (text below image)
+            WebElement desc = item.findElement(By.cssSelector("p, span, div"));
+            // adjust depending on site’s structure
+            String actualDesc = desc.getText().trim();
+            Assert.assertTrue("Description mismatch at item " + (i+1) +
+                            "\nExpected: " + expected.get("Description") +
+                            "\nActual: " + actualDesc,
+                    actualDesc.contains(expected.get("Description")));
         }
     }
 }
