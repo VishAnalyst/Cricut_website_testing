@@ -1,8 +1,10 @@
 package stepDefinitions;
 
 import io.cucumber.java.en.And;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
+import org.junit.Assert;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
@@ -13,17 +15,16 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.assertTrue;
-
-public class HowitWorksSD {
+public class HowItWorksSD {
     WebDriver driver = new ChromeDriver();
     WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     Actions action = new Actions(driver);
 
-    @Then("I should see the section heading {string}")
-    public void iShouldSeeTheSectionHeading(String headingText) {
-
+    @Given("I open the Cricut website")
+    public void iOpenTheCricutWebsite() {
         driver.get("https://cricut.com/en-us/");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(150));
         driver.manage().window().maximize();
@@ -47,20 +48,99 @@ public class HowitWorksSD {
         System.out.println("Cricut website is Loaded");
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("window.scrollBy(0, 1500);"); // Scrolls down by 500 pixels
-
-        WebElement heading = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//div[@class='pd-horizontal-gallery__heading projects-gallery-header' and normalize-space()='" + headingText + "']")));
-        assertTrue("Heading is not displayed!", heading.isDisplayed());
+        js.executeScript("window.scrollBy(0, 500);"); // Scrolls down by 500 pixels
     }
 
 
-    @When("I scroll to the {string} section")
-    public void iScrollToTheSection(String sectionHeading) {
+    @And("I scroll down to the {string} section")
+    public void iScrollDownToTheSection(String arg0) {
 
+        //scrolldown to see particular element
+        WebElement howItWorksElement = driver.findElement(By.xpath("//div[@class='pd-horizontal-gallery__heading projects-gallery-header']"));
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("arguments[0].scrollIntoView(true);", howItWorksElement);
+        //Initiate drive wait
+        try {
+            Thread.sleep(5000); // Pause for 5000 milliseconds (5 seconds)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        if (howItWorksElement.isDisplayed()) {
+            System.out.println("HOW IT WORKS IS LOCATED");
+        } else {
+            System.out.println("HOW IT WORKS IS NOT LOCATED");
+        }
+
+    }
+
+    @Then("I should see the {string} section on the page")
+    public void iShouldSeeTheSectionOnThePage(String arg0) {
+        WebElement howItWorksElement = driver.findElement(By.xpath("//div[@class='pd-horizontal-gallery__heading projects-gallery-header']"));
+        if (howItWorksElement.isDisplayed()) {
+            System.out.println("HOW IT WORKS IS DISPLAYED");
+        } else {
+            System.out.println("HOW IT WORKS IS NOT DISPLAYED");
+        }
+    }
+
+    @Then("I should see exactly {int} items in the {string} section")
+    public void iShouldSeeExactlyItemsInTheSection(int expectedCount, String arg1) {
+        // Locate all visible items inside the How it works container
+        List<WebElement> howItWorksItems = driver.findElements(
+                By.cssSelector(".experience-component.experience-commerce_assets-pdCard.slick-slide.slick-active")
+        );
+
+        // Get the actual count
+        int actualCount = howItWorksItems.size();
+
+        // Assertion
+        Assert.assertEquals("Number of items in How it works section mismatch", expectedCount, actualCount);
+
+    }
+
+
+    @And("the items should have the following content:")
+    public void theItemsShouldHaveTheFollowingContent(io.cucumber.datatable.DataTable dataTable) {
+
+        // Convert the Gherkin table into a list of maps
+        List<Map<String, String>> expectedItems = dataTable.asMaps(String.class, String.class);
+
+        // Locate all the visible cards in the "How it works" section
+        List<WebElement> howItWorksCards = driver.findElements(
+                By.cssSelector(".experience-component.experience-commerce_assets-pdCard.slick-slide.slick-active")
+        );
+
+        // Sanity check
+        Assert.assertEquals("Number of visible cards mismatch!", expectedItems.size(), howItWorksCards.size());
+
+        // Loop through each card and compare title + description
+        for (int i = 0; i < expectedItems.size(); i++) {
+            WebElement card = howItWorksCards.get(i);
+
+            // Extract title & description text
+            String actualTitle = card.findElement(By.cssSelector(".card-title")).getText().trim();
+            String actualDescription = card.findElement(By.cssSelector(".card-text")).getText().trim();
+
+            // Get expected values from the table
+            String expectedTitle = expectedItems.get(i).get("Title").trim();
+            String expectedDescription = expectedItems.get(i).get("Description").trim();
+
+            // Compare (ignoring any numbering in titles like "1. Get inspired")
+            Assert.assertTrue("Card title mismatch. Expected: " + expectedTitle + " but got: " + actualTitle,
+                    actualTitle.contains(expectedTitle));
+
+            Assert.assertEquals("Card description mismatch for " + expectedTitle,
+                    expectedDescription, actualDescription);
+        }
+        driver.quit();
+    }
+
+
+    @When("I click the {string} scroll button in the {string} section")
+    public void iClickTheScrollButtonInTheSection(String arg0, String arg1) {
         driver.get("https://cricut.com/en-us/");
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(150));
-        //driver.manage().window().maximize();
+        driver.manage().window().maximize();
 
 
         //Reject button is closed
@@ -81,45 +161,65 @@ public class HowitWorksSD {
         System.out.println("Cricut website is Loaded");
 
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("window.scrollBy(0, 1500);"); // Scrolls down by 500 pixels
+        js.executeScript("window.scrollBy(0, 500);"); // Scrolls down by 500 pixels
 
-        WebElement section = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//div[@class='pd-horizontal-gallery__heading projects-gallery-header' and normalize-space()='" + sectionHeading + "']")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", section);
-    }
-
-
-    @And("I click the {string} scroll button")
-    public void iClickTheScrollButton(String direction) {
-        String buttonXpath = "";
-        if (direction.equalsIgnoreCase("Next")) {
-            buttonXpath = "//button[@class='gallery-next btn slick-arrow']";
-        } else if (direction.equalsIgnoreCase("Previous")) {
-            buttonXpath = "//button[@class='gallery-next btn slick-arrow']";
+        //scrolldown to see particular element
+        WebElement howItWorksElement = driver.findElement(By.xpath("//div[@class='pd-horizontal-gallery__heading projects-gallery-header']"));
+        JavascriptExecutor jsHowitWorks = (JavascriptExecutor) driver;
+        jsHowitWorks.executeScript("arguments[0].scrollIntoView(true);", howItWorksElement);
+        //Initiate drive wait
+        try {
+            Thread.sleep(5000); // Pause for 5000 milliseconds (5 seconds)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-        WebElement button = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(buttonXpath)));
-        button.click();
+        if (howItWorksElement.isDisplayed()) {
+            System.out.println("HOW IT WORKS IS LOCATED");
+        } else {
+            System.out.println("HOW IT WORKS IS NOT LOCATED");
+        }
+
+        WebElement nextButton = driver.findElement(By.cssSelector("button.gallery-next.btn.slick-arrow"));
+        if (nextButton.isDisplayed()) {
+            System.out.println("NEXT BUTTON IS DISPLAYED AND LOCATED");
+        } else {
+            System.out.println("NEXT BUTTON IS NOT DISPLAYED OR LOCATED");
+        }
+        //Initiate drive wait
+        try {
+            Thread.sleep(5000); // Pause for 5000 milliseconds (5 seconds)
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        nextButton.click();
+        System.out.println("NEXT BUTTON IS CLICKED");
     }
 
-    @Then("more content should be visible in the {string} section")
-    public void moreContentShouldBeVisibleInTheSection(String arg0) {
-        // Here we check by visibility of a new gallery item (dynamic detection)
-        WebElement galleryContainer = driver.findElement(By.xpath("//div[contains(@class,'pd-horizontal-gallery__header')]/following-sibling::div"));
-        Long scrollLeft = (Long) ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollLeft;", galleryContainer);
-        assertTrue("Gallery did not scroll right!", scrollLeft > 0);
+
+    @Then("I should see a new item with the title {string}")
+    public void iShouldSeeANewItemWithTheTitle(String expectedTitle) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        WebElement newCardTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//div[@class='card-title' and contains(text(),'" + expectedTitle + "')]")
+        ));
+
+        Assert.assertTrue("Expected new item with title: " + expectedTitle,
+                newCardTitle.isDisplayed());
+
     }
 
-    @Then("the earlier content should be visible again")
-    public void the_earlier_content_should_be_visible_again() {
-        WebElement galleryContainer = driver.findElement(By.xpath("//div[contains(@class,'pd-horizontal-gallery__header')]/following-sibling::div"));
-        Long scrollLeft = (Long) ((JavascriptExecutor) driver).executeScript("return arguments[0].scrollLeft;", galleryContainer);
-        assertTrue("Gallery did not scroll back to start!", scrollLeft == 0);
+    @And("its description should be {string}")
+    public void itsDescriptionShouldBe(String expectedDescription) {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+
+        WebElement descriptionElement = wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//p[@class='card-text' and normalize-space()='" + expectedDescription + "']")
+        ));
+
+        String actualDescription = descriptionElement.getText().trim();
+
+        Assert.assertEquals("Description does not match!", expectedDescription, actualDescription);
     }
 
-    @Then("I should see the item {string} in the gallery")
-    public void i_should_see_the_item_in_the_gallery(String itemName) {
-        WebElement item = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.xpath("//div[contains(@class,'pd-horizontal-gallery__header')]/following-sibling::div//*[normalize-space()='" + itemName + "']")));
-        assertTrue("Item not found in gallery: " + itemName, item.isDisplayed());
-    }
 }

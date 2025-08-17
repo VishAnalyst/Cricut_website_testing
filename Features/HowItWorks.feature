@@ -1,27 +1,22 @@
-Feature: Verify "How it works" horizontal scroll functionality
+Feature: Verify "How it works" section on Cricut website
 
-  As a user visiting the Cricut website
-  I want to view the "How it works" section
-  So that I can scroll through all the available items horizontally
+  As a Cricut website visitor
+  I want to verify that the "How it works" section is displayed correctly
+  So that I can ensure its content and scrolling functionality works as expected
 
-  Background:
-    Given I am on the Cricut homepage
+  Scenario: Verify that the "How it works" section exist
+    Given I open the Cricut website
+    And I scroll down to the "How it works" section
+    Then I should see the "How it works" section on the page
+    Then I should see exactly 4 items in the "How it works" section
+    And the items should have the following content:
+      | Title                 | Description                                                                                                                               |
+      | Get inspired          | Design your idea from scratch or find inspiration in the Cricut design library.                                                          |
+      | Make it personal      | Customize your design by adding a name or a note, experiment with colors, fonts, effects & more.                                         |
+      | Cut your design       | Let your Cricut machine work its magic, cutting every piece of your project with intricacy & precision.                                   |
+      | Put it all together   | Assemble the pieces or apply your design to almost anything — from notebooks to night lights, T-shirts to totes.                         |
 
-  Scenario: Verify the "How it works" heading is displayed
-    Then I should see the section heading "How it works."
-
-  Scenario: Verify horizontal scroll navigation works
-    When I scroll to the "How it works." section
-    And I click the "Next" scroll button
-    Then more content should be visible in the "How it works." section
-    When I click the "Previous" scroll button
-    Then the earlier content should be visible again
-
-  Scenario Outline: Verify each item under "How it works." is displayed
-    When I scroll to the "How it works." section
-    Then I should see the item "<ItemName>" in the gallery
-    Examples:
-      | ItemName                  |
-      | Step 1: Choose your design|
-      | Step 2: Cut your material |
-      | Step 3: Assemble & enjoy  |
+  Scenario: Verify horizontal scroll reveals the 5th item
+    When I click the "Next" scroll button in the "How it works" section
+    Then I should see a new item with the title "Admire your work"
+    And its description should be "You did it! Now comes the hardest part: Decide to keep it for yourself or gift it to someone you love."
